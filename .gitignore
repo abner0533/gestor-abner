@@ -1,0 +1,5 @@
+data/google-oauth-client.json
+data/google-calendar-token.json
+data/gemini-config.json
+data/tasks.json
+node_modules/

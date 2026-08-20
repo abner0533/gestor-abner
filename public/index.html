@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Gestor Abner</title>
+    <meta name="description" content="Gestor pessoal para capturar demandas, planejar blocos de foco e sincronizar com a agenda.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="nav-rail" aria-label="Navegacao principal">
+        <div class="brand-lockup">
+          <span class="brand-mark" aria-hidden="true">GA</span>
+          <div>
+            <p>Gestor</p>
+            <strong>Abner</strong>
+          </div>
+        </div>
+
+        <nav class="main-nav">
+          <button class="nav-item active" type="button" data-view="today" data-title="Plano de hoje" data-subtitle="Blocos de foco, agenda do dia e a proxima acao certa.">
+            <span class="nav-index">01</span>
+            <span>Hoje</span>
+          </button>
+          <button class="nav-item" type="button" data-view="week" data-title="Semana inteligente" data-subtitle="Demandas distribuidas por prioridade, prazo e espaco livre na agenda.">
+            <span class="nav-index">02</span>
+            <span>Semana</span>
+          </button>
+          <button class="nav-item" type="button" data-view="capture" data-title="Capturar demanda" data-subtitle="Fale ou escreva solto. O gestor transforma em proxima acao.">
+            <span class="nav-index">03</span>
+            <span>Captura</span>
+          </button>
+          <button class="nav-item" type="button" data-view="tasks" data-title="Central de demandas" data-subtitle="Fila por cliente, prioridade, status e texto do gestor.">
+            <span class="nav-index">04</span>
+            <span>Demandas</span>
+          </button>
+          <button class="nav-item" type="button" data-view="agenda" data-title="Agenda e bloqueios" data-subtitle="Google Calendar, horarios ocupados e protecao contra conflito.">
+            <span class="nav-index">05</span>
+            <span>Agenda</span>
+          </button>
+        </nav>
+
+        <div class="system-stack">
+          <span class="day-chip" id="todayLabel">Hoje</span>
+          <span class="live-status" id="saveStatus">Local</span>
+          <span class="voice-status ai-mode" id="geminiStatus">Texto local</span>
+        </div>
+      </aside>
+
+      <div class="app-main">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow" id="viewEyebrow">Execucao assistida</p>
+            <h1 id="viewTitle">Plano de hoje</h1>
+            <p class="view-subtitle" id="viewSubtitle">Blocos de foco, agenda do dia e a proxima acao certa.</p>
+          </div>
+          <div class="stats-strip" id="statsStrip"></div>
+        </header>
+
+        <main class="workspace">
+          <section class="view-panel today-view active" data-view-panel="today" aria-labelledby="todayTitle">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Execucao</p>
+                <h2 id="todayTitle">Agora</h2>
+              </div>
+            </div>
+            <div class="next-focus" id="nextFocus"></div>
+            <div class="timeline-shell">
+              <div class="section-heading compact">
+                <div>
+                  <p class="eyebrow">Linha do tempo</p>
+                  <h2>Hoje</h2>
+                </div>
+              </div>
+              <div class="timeline" id="timeline"></div>
+            </div>
+          </section>
+
+          <section class="view-panel week-view" data-view-panel="week" aria-labelledby="weekTitle">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Planejamento</p>
+                <h2 id="weekTitle">Semana</h2>
+              </div>
+            </div>
+            <div class="week-plan" id="weekPlan"></div>
+          </section>
+
+          <section class="view-panel capture-panel" data-view-panel="capture" aria-labelledby="captureTitle">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Inbox</p>
+                <h2 id="captureTitle">Jogar demanda</h2>
+              </div>
+              <span class="capture-signal">Entrada rapida</span>
+            </div>
+
+            <form id="taskForm" class="capture-form">
+              <textarea id="rawText" name="rawText" rows="7" maxlength="900" placeholder="Ex: preciso desenvolver briefings de novos criativos para cliente Bluma, importante mas nao sei o melhor prazo"></textarea>
+              <div class="voice-controls">
+                <button class="secondary-action" id="voiceButton" type="button">
+                  <span class="voice-dot" aria-hidden="true"></span>
+                  <span>Falar demanda</span>
+                </button>
+                <span class="voice-status" id="voiceStatus">Voz pronta</span>
+              </div>
+              <label class="field-row">
+                <span>Conta</span>
+                <select id="accountSelect" name="accountId">
+                  <option value="auto">Auto</option>
+                </select>
+              </label>
+              <div class="urgency-row" role="radiogroup" aria-label="Urgencia">
+                <label class="urgency-pill active">
+                  <input type="radio" name="urgency" value="auto" checked>
+                  <span>Auto</span>
+                </label>
+                <label class="urgency-pill">
+                  <input type="radio" name="urgency" value="fire">
+                  <span>Muito urgente</span>
+                </label>
+                <label class="urgency-pill">
+                  <input type="radio" name="urgency" value="high">
+                  <span>Alta</span>
+                </label>
+                <label class="urgency-pill">
+                  <input type="radio" name="urgency" value="later">
+                  <span>Alta depois</span>
+                </label>
+                <label class="urgency-pill">
+                  <input type="radio" name="urgency" value="normal">
+                  <span>Normal</span>
+                </label>
+                <label class="urgency-pill">
+                  <input type="radio" name="urgency" value="low">
+                  <span>Baixa</span>
+                </label>
+              </div>
+              <button class="primary-action" type="submit">
+                <span class="button-icon">+</span>
+                <span>Lancar demanda</span>
+              </button>
+            </form>
+          </section>
+
+          <section class="view-panel tasks-view" data-view-panel="tasks" aria-labelledby="queueTitle">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Fila</p>
+                <h2 id="queueTitle">Demandas</h2>
+              </div>
+            </div>
+            <div class="account-filters" id="accountFilters"></div>
+            <div class="tabs" role="tablist" aria-label="Filtro de demandas">
+              <button class="tab active" data-filter="active" type="button">Ativas</button>
+              <button class="tab" data-filter="later" type="button">Planejadas</button>
+              <button class="tab" data-filter="overdue" type="button">Atrasadas</button>
+              <button class="tab" data-filter="done" type="button">Concluidas</button>
+            </div>
+            <div class="task-list" id="taskList"></div>
+          </section>
+
+          <section class="view-panel agenda-view" data-view-panel="agenda" aria-labelledby="busyTitle">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Agenda</p>
+                <h2 id="busyTitle">Bloqueios</h2>
+              </div>
+            </div>
+            <div class="calendar-card" id="calendarPanel">
+              <div>
+                <strong>Google Calendar</strong>
+                <span id="calendarStatus">Verificando</span>
+              </div>
+              <div class="calendar-actions">
+                <button class="secondary-action" id="connectCalendar" type="button">Conectar</button>
+                <button class="secondary-action" id="pushCalendar" type="button" hidden>Criar semana</button>
+                <button class="secondary-action" id="syncCalendar" type="button" hidden>Ler agenda</button>
+                <button class="secondary-action" id="watchCalendar" type="button" hidden>Ativar notificacoes</button>
+                <button class="secondary-action" id="disconnectCalendar" type="button" hidden>Desconectar</button>
+              </div>
+              <p class="calendar-error" id="calendarError" hidden></p>
+            </div>
+            <form id="busyForm" class="busy-form">
+              <input id="busyTitleInput" name="title" type="text" maxlength="80" placeholder="Reuniao / compromisso">
+              <div class="busy-grid">
+                <input id="busyDateInput" name="date" type="date">
+                <input id="busyStartInput" name="start" type="time" value="12:00">
+                <input id="busyEndInput" name="end" type="time" value="14:00">
+              </div>
+              <button class="secondary-action" type="submit">Bloquear horario</button>
+            </form>
+            <div class="busy-list" id="busyList"></div>
+          </section>
+        </main>
+      </div>
+    </div>
+
+    <dialog class="checkin-dialog" id="checkinDialog">
+      <form method="dialog" class="dialog-body" id="checkinForm">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Check-in</p>
+            <h2 id="checkinTitle">O que aconteceu?</h2>
+          </div>
+          <button class="icon-button" value="cancel" aria-label="Fechar" type="submit">x</button>
+        </div>
+        <p class="dialog-task" id="checkinTask"></p>
+        <textarea id="checkinReason" rows="4" maxlength="500" placeholder="Ex: ficou maior do que parecia, faltou informacao, entrou uma urgencia..."></textarea>
+        <div class="dialog-actions">
+          <button type="button" data-action="today">Ainda hoje</button>
+          <button type="button" data-action="tomorrow">Amanha</button>
+          <button type="button" data-action="next-week">Proxima semana</button>
+          <button type="button" data-action="split">Criar primeiro passo</button>
+          <button type="button" data-action="low">Baixar prioridade</button>
+          <button type="button" data-action="blocked">Travou</button>
+        </div>
+      </form>
+    </dialog>
+
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>
