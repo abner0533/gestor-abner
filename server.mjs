@@ -2556,17 +2556,6 @@ async function handleApi(req, res, url) {
     return json(res, 201, { task: taskView(task, targetDate), plan: buildPlan(store.tasks, store.settings, targetDate) });
   }
 
-  if (req.method === 'POST' && url.pathname === '/api/admin/import-legacy') {
-    const body = await readBody(req);
-    if (!Array.isArray(body.tasks)) {
-      return json(res, 400, { error: 'Payload invalido: esperado { tasks: [...] }.' });
-    }
-    store.tasks = body.tasks;
-    if (body.settings) store.settings = normalizeSettings(body.settings);
-    await writeStore(store);
-    return json(res, 200, { imported: store.tasks.length });
-  }
-
   const enhanceMatch = url.pathname.match(/^\/api\/tasks\/([^/]+)\/enhance$/);
   if (enhanceMatch && req.method === 'POST') {
     const id = enhanceMatch[1];
